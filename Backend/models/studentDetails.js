@@ -6,8 +6,7 @@ const studentSchema = new mongoose.Schema({
     required: true
   },
   psflag: {
-    type: Number,
-    required: true
+    type: Number
   },
   firstname: {
     type: String,
@@ -63,8 +62,7 @@ const studentSchema = new mongoose.Schema({
   },
   email: {
     type: Array,
-    required: true,
-    of: Number
+    required: true
   },
   password: {
     type: String,
