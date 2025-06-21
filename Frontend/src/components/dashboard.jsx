@@ -26,6 +26,8 @@ function ProfilePage() {
   const [profileDetails, setProfileDetails] = useState(null);
   const [attendanceData, setAttendanceData] = useState(null);
   const [attendancePer, setAttendancePer] = useState(0);
+  const [gainAttendancePer, setGainAttendancePer] = useState(0);
+  const [lossAttendancePer, setLossAttendancePer] = useState(0);
   const [twoWeekSessions, setTwoWeekSessions] = useState(0);
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -67,6 +69,24 @@ function ProfilePage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const { dayObjects, totalPercentage, twoWeekSessions } = response.data;
+      
+      const tws=twoWeekSessions // 2 week sessions
+      // const total_sessions = Math.round((tws.present + tws.absent)/(totalPercentage / 100))
+      let gainRate=Math.round((tws.present / (tws.present + tws.absent))*10000) / 100 
+      gainRate = (Math.abs(gainRate- totalPercentage)) / (tws.present + tws.absent) // 2 weeks attendance gain rate per session
+      gainRate = Math.round(gainRate*7*100)/100//formatting
+
+      let lossRate = Math.abs((Math.round((tws.present / (tws.present + tws.absent))*10000) / 100) - 100) / (tws.present + tws.absent) // 2 weeks attendance loss rate per session
+      console.log(lossRate)
+      lossRate = Math.round(lossRate*7*100) / 100 //formatting
+      console.log(lossRate)
+
+
+      const absentEstimate = totalPercentage - lossRate
+      const presentEstimate = parseFloat(totalPercentage) + gainRate
+
+      setLossAttendancePer(absentEstimate)
+      setGainAttendancePer(presentEstimate)
       setAttendanceData(dayObjects);
       setAttendancePer(totalPercentage);
       setTwoWeekSessions(twoWeekSessions);
@@ -260,6 +280,38 @@ function ProfilePage() {
                 {/* Progress Bar */}
                 <LinearProgressBar attendancePer={attendancePer} />
               </div>
+              {/* Loss Percentage */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className={`text-xs font-medium ${darkMode ? "text-gray-400" : "text-gray-700"}`}>
+                    Estimated Attendance Loss for Tommorow
+                  </span>
+                  <div className="px-3 py-1.5 bg-blue-50 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-semibold text-blue-600">
+                      {lossAttendancePer}%
+                    </span>
+                  </div>
+                </div>
+                {/* Progress Bar */}
+                <LinearProgressBar attendancePer={lossAttendancePer} />
+              </div>
+
+              {/* Gain Percentage */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className={`text-xs font-medium ${darkMode ? "text-gray-400" : "text-gray-700"}`}>
+                    Estimated Attendance Gain for Tommorow
+                  </span>
+                  <div className="px-3 py-1.5 bg-blue-50 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-semibold text-blue-600">
+                      {gainAttendancePer}%
+                    </span>
+                  </div>
+                </div>
+                {/* Progress Bar */}
+                <LinearProgressBar attendancePer={gainAttendancePer} />
+              </div>
+
 
               {/* Recent Sessions */}
               <div className="space-y-3">
