@@ -5,3 +5,5 @@ Join us in reshaping student engagement with their educational path. Welcome to 
 
 
 ### all credits to -> https://github.com/Abhi-GX/Spectra
+
+the backend is the same as used for https://spectra-beta.vercel.app/
