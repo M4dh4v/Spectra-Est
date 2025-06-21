@@ -28,6 +28,7 @@ function ProfilePage() {
   const [attendancePer, setAttendancePer] = useState(0);
   const [gainAttendancePer, setGainAttendancePer] = useState(0);
   const [lossAttendancePer, setLossAttendancePer] = useState(0);
+  const [estimateAccuracy, setEstimateAccuracy] = useState(0)
   const [twoWeekSessions, setTwoWeekSessions] = useState(0);
   const [token, setToken] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -61,6 +62,39 @@ function ProfilePage() {
     }
   };
 
+  function findClosestPair(p) {
+  const targetRatio = p / 100;
+  let bestA = 0;
+  let bestB = 300;
+  let bestDiff = Infinity;
+
+  for (let b = 300; b <= 400; b++) {
+    // ideal (real) numerator to hit the target exactly
+    const idealA = targetRatio * b;
+
+    // only need to check the two nearest integers
+    const candidates = [Math.floor(idealA), Math.ceil(idealA)];
+
+    for (const a of candidates) {
+      const ratio = a / b;
+      const diff = Math.abs(ratio - targetRatio);
+
+      if (diff < bestDiff) {
+        bestDiff = diff;
+        bestA = a;
+        bestB = b;
+      }
+    }
+  }
+
+  const achievedPercent = (bestA / bestB) * 100;
+  return {
+    a: bestA,
+    b: bestB,
+    percentage: Math.round(achievedPercent * 1e4) / 1e4
+  };
+}
+
   const fetchAttendanceData = async (token) => {
     try {
       const response = await axios.post(
@@ -69,22 +103,36 @@ function ProfilePage() {
         { headers: { Authorization: `Bearer ${token}` } }
       );
       const { dayObjects, totalPercentage, twoWeekSessions } = response.data;
+
+
+      // PREVIOUS ALGO
+      // const tws=twoWeekSessions // 2 week sessions
+      // // const total_sessions = Math.round((tws.present + tws.absent)/(totalPercentage / 100))
+      // let gainRate=Math.round((tws.present / (tws.present + tws.absent))*10000) / 100 
+      // gainRate = (Math.abs(gainRate- totalPercentage)) / (tws.present + tws.absent) // 2 weeks attendance gain rate per session
+      // gainRate = Math.round(gainRate*7*100)/100//formatting
+
+      // let lossRate = Math.abs((Math.round((tws.present / (tws.present + tws.absent))*10000) / 100) - 100) / (tws.present + tws.absent) // 2 weeks attendance loss rate per session
+      // // console.log(lossRate)
+      // lossRate = Math.round(lossRate*7*100) / 100 //formatting
+      // // console.log(lossRate)
+
+
+      // NEW ALGO V2
+      const ap= parseFloat(totalPercentage)
+      // console.log('attendance',ap, '', typeof(ap))
+      const result = findClosestPair(ap)
+      // console.log('num: ',result.a, ' dem: ',result.b, ' percent: ', result.percentage)
+
+      const accuracy = Math.round(Math.abs(Math.abs(result.percentage-ap) - 1) * 10000)/100
+
       
-      const tws=twoWeekSessions // 2 week sessions
-      // const total_sessions = Math.round((tws.present + tws.absent)/(totalPercentage / 100))
-      let gainRate=Math.round((tws.present / (tws.present + tws.absent))*10000) / 100 
-      gainRate = (Math.abs(gainRate- totalPercentage)) / (tws.present + tws.absent) // 2 weeks attendance gain rate per session
-      gainRate = Math.round(gainRate*7*100)/100//formatting
-
-      let lossRate = Math.abs((Math.round((tws.present / (tws.present + tws.absent))*10000) / 100) - 100) / (tws.present + tws.absent) // 2 weeks attendance loss rate per session
-      console.log(lossRate)
-      lossRate = Math.round(lossRate*7*100) / 100 //formatting
-      console.log(lossRate)
 
 
-      const absentEstimate = totalPercentage - lossRate
-      const presentEstimate = parseFloat(totalPercentage) + gainRate
+      const absentEstimate = Math.round(result.a*10000/(result.b + 7))/100
+      const presentEstimate = Math.round((result.a + 7)*10000 / (result.b + 7))/100
 
+      setEstimateAccuracy(accuracy)
       setLossAttendancePer(absentEstimate)
       setGainAttendancePer(presentEstimate)
       setAttendanceData(dayObjects);
@@ -310,6 +358,21 @@ function ProfilePage() {
                 </div>
                 {/* Progress Bar */}
                 <LinearProgressBar attendancePer={gainAttendancePer} />
+              </div>
+              {/* Loss Percentage */}
+              <div className="mb-6">
+                <div className="flex justify-between items-center mb-1.5">
+                  <span className={`text-xs font-medium ${darkMode ? "text-gray-400" : "text-gray-700"}`}>
+                    Estimation Accuracy
+                  </span>
+                  <div className="px-3 py-1.5 bg-blue-50 rounded-full flex items-center justify-center">
+                    <span className="text-sm font-semibold text-blue-600">
+                      {estimateAccuracy}%
+                    </span>
+                  </div>
+                </div>
+                {/* Progress Bar */}
+                <LinearProgressBar attendancePer={estimateAccuracy} />
               </div>
 
 
