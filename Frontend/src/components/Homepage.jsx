@@ -262,16 +262,6 @@ const UserInputPage = () => {
     >
       <div className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         {/* Announcement Banner */}
-        <div
-          className={`mb-4 sm:mb-8 rounded-lg ${
-            darkMode ? "bg-gray-800" : "bg-blue-500"
-          } p-3 sm:p-4 ${darkMode ? "text-gray-200" : "text-white"} shadow-lg`}
-        >
-          <p className="text-center text-xs sm:text-sm font-medium">
-            First-year students: Register on Spectra to access your academic
-            profile
-          </p>
-        </div>
 
         {/* Hero Section */}
         <div className="mb-6 sm:mb-12 text-center">
