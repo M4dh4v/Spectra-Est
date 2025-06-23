@@ -359,22 +359,7 @@ function ProfilePage() {
                 {/* Progress Bar */}
                 <LinearProgressBar attendancePer={gainAttendancePer} />
               </div>
-              {/* Loss Percentage */}
-              <div className="mb-6">
-                <div className="flex justify-between items-center mb-1.5">
-                  <span className={`text-xs font-medium ${darkMode ? "text-gray-400" : "text-gray-700"}`}>
-                    Estimation Accuracy
-                  </span>
-                  <div className="px-3 py-1.5 bg-blue-50 rounded-full flex items-center justify-center">
-                    <span className="text-sm font-semibold text-blue-600">
-                      {estimateAccuracy}%
-                    </span>
-                  </div>
-                </div>
-                {/* Progress Bar */}
-                <LinearProgressBar attendancePer={estimateAccuracy} />
-              </div>
-
+            
 
               {/* Recent Sessions */}
               <div className="space-y-3">
