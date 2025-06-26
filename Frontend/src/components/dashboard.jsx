@@ -65,10 +65,10 @@ function ProfilePage() {
   function findClosestPair(p) {
   const targetRatio = p / 100;
   let bestA = 0;
-  let bestB = 300;
+  let bestB = 500;
   let bestDiff = Infinity;
 
-  for (let b = 300; b <= 400; b++) {
+  for (let b = 500; b <= 600; b++) {
     // ideal (real) numerator to hit the target exactly
     const idealA = targetRatio * b;
 
